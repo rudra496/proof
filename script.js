@@ -6,6 +6,9 @@ let selectedDuration = 1;
 let statementAmount = 0;
 const uploadedFiles = {};
 
+// ===== SERVER API =====
+const API_BASE_URL = '';
+
 // ===== PRICING DATA (Percentage-based) =====
 const planPricing = {
   cas: { percent: 1.2, name: 'CAS Only' },
@@ -419,16 +422,18 @@ applicationForm.addEventListener('submit', async (e) => {
     formData.append(field, uploadedFiles[field]);
   });
   
-  // Simulate submission (replace with actual API call)
   try {
-    // In a real application, you would send this to your server
-    // await fetch('/api/apply', { method: 'POST', body: formData });
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Success
-    showToast('Application submitted successfully! We will contact you shortly.', 'success');
+    const response = await fetch(`${API_BASE_URL}/api/apply`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload request failed');
+    }
+
+    const result = await response.json();
+    showToast(`Submitted! Ref: ${result.applicationId}. Files are available in server uploads.`, 'success');
     
     // Reset form and close modal
     setTimeout(() => {
