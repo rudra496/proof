@@ -1,940 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FundProof Pro - Professional Proof of Funds Services</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private File Upload (Supabase)</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #0b1020;
+      color: #e7eaf3;
+    }
+    .card {
+      width: min(92vw, 520px);
+      background: #111831;
+      border: 1px solid #2b355f;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+    p {
+      margin: 0 0 16px;
+      opacity: .9;
+      font-size: .95rem;
+      line-height: 1.4;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px dashed #42508e;
+      border-radius: 10px;
+      background: #0f1630;
+      color: inherit;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #4c72ff;
+      color: white;
+    }
+    button.secondary {
+      background: #2f3b66;
+    }
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+    #status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #0f1630;
+      border: 1px solid #2b355f;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: .9rem;
+      min-height: 24px;
+    }
+  </style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <div class="logo-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-        </div>
-        <span class="logo-text">FundProof Pro</span>
-      </a>
-      <div class="nav-links" id="navLinks">
-        <a href="#home">Home</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#features">Features</a>
-        <a href="#contact">Contact</a>
-        <button class="btn btn-primary" onclick="showForm()">Apply Now</button>
-      </div>
-      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-      </button>
+  <main class="card">
+    <h1>Private Upload (Supabase Storage)</h1>
+    <p>
+      Uploads go to private bucket <code>uploads</code>. Files are opened only with short-lived signed URLs.
+    </p>
+
+    <input id="fileInput" type="file" />
+
+    <div class="row">
+      <button id="uploadBtn" type="button">Upload File</button>
+      <button id="openBtn" type="button" class="secondary" disabled>Open Uploaded File (Signed URL)</button>
     </div>
-  </nav>
 
-  <!-- Hero Section -->
-  <section class="hero" id="home">
-    <div class="container">
-      <div class="hero-badge">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-        Trusted by 10,000+ clients worldwide
-      </div>
-      <h1 class="hero-title">Your Gateway to <span class="gradient-text">Financial Freedom</span></h1>
-      <p class="hero-subtitle">Professional proof of funds services for your CAS, Visa, and immigration applications. Fast, reliable, and secure documentation.</p>
-      <div class="hero-buttons">
-        <button class="btn btn-primary btn-lg" onclick="showForm()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          Start Your Application
-        </button>
-        <a href="#how-it-works" class="btn btn-outline btn-lg">
-          Learn More
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
-      </div>
-      
-      <!-- Quick Stats -->
-      <div class="hero-stats">
-        <div class="stat-item">
-          <span class="stat-value">3-5</span>
-          <span class="stat-label">Days Processing</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value">10,000+</span>
-          <span class="stat-label">Happy Clients</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-value">99%</span>
-          <span class="stat-label">Success Rate</span>
-        </div>
-      </div>
-    </div>
-  </section>
+    <div id="status" role="status" aria-live="polite"></div>
+  </main>
 
-  <!-- Application Form Modal -->
-  <div class="modal-overlay" id="formModal">
-    <div class="modal">
-      <button class="modal-close" onclick="hideForm()">&times;</button>
-      
-      <!-- Progress Steps -->
-      <div class="progress-container">
-        <div class="progress-steps">
-          <div class="step active" data-step="1">
-            <div class="step-circle">1</div>
-            <span class="step-label">Plan</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step" data-step="2">
-            <div class="step-circle">2</div>
-            <span class="step-label">Details</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step" data-step="3">
-            <div class="step-circle">3</div>
-            <span class="step-label">Next of Kin</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step" data-step="4">
-            <div class="step-circle">4</div>
-            <span class="step-label">Documents</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step" data-step="5">
-            <div class="step-circle">5</div>
-            <span class="step-label">Payment</span>
-          </div>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-      </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Supabase "anon" key is safe in frontend apps by design.
+    // It does NOT bypass RLS. Your Storage policies still enforce what this page can do.
+    const SUPABASE_URL = 'https://voljywzegdgxxcvymlhp.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_5xMvlF8dkzsKSjNYe_8lZg_HPVivB7R';
+    const BUCKET = 'uploads';
 
-      <!-- Form Steps -->
-      <form id="applicationForm">
-        <!-- Step 1: Plan Selection -->
-        <div class="form-step active" data-step="1">
-          <h2 class="form-title">Choose Your Service Plan</h2>
-          <p class="form-subtitle">Select the service that best fits your needs</p>
-          
-          <div class="plan-cards">
-            <div class="plan-card" data-plan="cas" onclick="selectPlan('cas')">
-              <div class="plan-check">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-              </div>
-              <div class="plan-icon icon-teal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-              </div>
-              <h3 class="plan-name">CAS Only</h3>
-              <p class="plan-desc">For university admission confirmation</p>
-              <div class="plan-fee">
-                <span class="fee-value">1.2%</span>
-                <span class="fee-note">of your statement amount</span>
-              </div>
-            </div>
-            
-            <div class="plan-card popular" data-plan="visa" onclick="selectPlan('visa')">
-              <div class="popular-badge">MOST POPULAR</div>
-              <div class="plan-check">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-              </div>
-              <div class="plan-icon icon-purple">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-              </div>
-              <h3 class="plan-name">Visa Only</h3>
-              <p class="plan-desc">For visa application proof of funds</p>
-              <div class="plan-fee">
-                <span class="fee-value">1.2%</span>
-                <span class="fee-note">of your statement amount</span>
-              </div>
-            </div>
-            
-            <div class="plan-card" data-plan="both" onclick="selectPlan('both')">
-              <div class="plan-check">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-              </div>
-              <div class="plan-icon icon-orange">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-              </div>
-              <h3 class="plan-name">CAS + Visa</h3>
-              <p class="plan-desc">Complete package for both services</p>
-              <div class="plan-fee">
-                <span class="fee-value">1.7%</span>
-                <span class="fee-note">of your statement amount</span>
-              </div>
-            </div>
-          </div>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-          <div class="duration-section">
-            <label class="section-label">Statement Duration</label>
-            <p class="section-hint">How long do you need the bank statement for?</p>
-            <div class="duration-options">
-              <div class="duration-option selected" data-duration="1" onclick="selectDuration(1)">
-                <span class="duration-value">1 Month</span>
-                <span class="duration-note available">Available</span>
-              </div>
-              <div class="duration-option coming-soon" data-duration="3">
-                <span class="duration-value">3 Months</span>
-                <span class="duration-note">Coming Soon</span>
-              </div>
-              <div class="duration-option coming-soon" data-duration="6">
-                <span class="duration-value">6 Months</span>
-                <span class="duration-note">Coming Soon</span>
-              </div>
-              <div class="duration-option coming-soon" data-duration="12">
-                <span class="duration-value">12 Months</span>
-                <span class="duration-note">Coming Soon</span>
-              </div>
-            </div>
-          </div>
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const openBtn = document.getElementById('openBtn');
+    const statusEl = document.getElementById('status');
 
-          <div class="amount-section">
-            <label class="section-label">How much do you need to show in your statement?</label>
-            <p class="section-hint">Enter the total amount you want to appear in your bank statement</p>
-            <div class="amount-input-wrapper">
-              <span class="currency-symbol">$</span>
-              <input type="number" id="statementAmount" placeholder="Example: 50000" oninput="calculateFee()">
-            </div>
-          </div>
+    let uploadedPath = null;
 
-          <div class="price-summary" id="priceSummary" style="display: none;">
-            <h4>Your Service Fee</h4>
-            <div class="summary-breakdown">
-              <div class="summary-row">
-                <span>Selected Plan</span>
-                <strong id="selectedPlanName">-</strong>
-              </div>
-              <div class="summary-row">
-                <span>Statement Amount</span>
-                <strong id="statementAmountDisplay">-</strong>
-              </div>
-              <div class="summary-row">
-                <span>Service Fee Rate</span>
-                <strong id="serviceFeePercent">-</strong>
-              </div>
-            </div>
-            <div class="summary-total">
-              <span>Total Service Fee</span>
-              <strong id="totalPrice">-</strong>
-            </div>
-          </div>
-        </div>
+    function setStatus(message, isError = false) {
+      statusEl.textContent = message;
+      statusEl.style.borderColor = isError ? '#a43f5d' : '#2b355f';
+    }
 
-        <!-- Step 2: Applicant Details -->
-        <div class="form-step" data-step="2">
-          <h2 class="form-title">Your Personal Information</h2>
-          <p class="form-subtitle">Please provide accurate details for your application</p>
+    function createUniquePath(file) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const ext = safeName.includes('.') ? safeName.split('.').pop() : 'bin';
+      const base = safeName.replace(/\.[^.]+$/, '');
+      const unique = `${Date.now()}-${crypto.randomUUID()}`;
+      return `${unique}-${base}.${ext}`;
+    }
 
-          <!-- Personal Info Section -->
-          <div class="form-section">
-            <h4 class="form-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Personal Details
-            </h4>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>NIN (National Identity Number) *</label>
-                <input type="text" name="nin" placeholder="Enter your NIN" required>
-              </div>
-              <div class="form-group">
-                <label>BVN (Bank Verification Number) *</label>
-                <input type="text" name="bvn" placeholder="Enter your BVN" required>
-              </div>
-              <div class="form-group">
-                <label>Title *</label>
-                <select name="title" required>
-                  <option value="">Select title</option>
-                  <option value="Mr">Mr</option>
-                  <option value="Mrs">Mrs</option>
-                  <option value="Miss">Miss</option>
-                  <option value="Ms">Ms</option>
-                  <option value="Dr">Dr</option>
-                  <option value="Prof">Prof</option>
-                  <option value="Chief">Chief</option>
-                  <option value="Alhaji">Alhaji</option>
-                  <option value="Alhaja">Alhaja</option>
-                </select>
-              </div>
-            </div>
+    async function uploadFile(file) {
+      if (!file) throw new Error('Please choose a file first.');
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Surname *</label>
-                <input type="text" name="surname" placeholder="Your surname" required>
-              </div>
-              <div class="form-group">
-                <label>First Name *</label>
-                <input type="text" name="firstName" placeholder="Your first name" required>
-              </div>
-              <div class="form-group">
-                <label>Middle Name (Optional)</label>
-                <input type="text" name="middleName" placeholder="Your middle name">
-              </div>
-            </div>
+      const path = createUniquePath(file);
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Gender *</label>
-                <select name="gender" required>
-                  <option value="">Select gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Marital Status *</label>
-                <select name="maritalStatus" required>
-                  <option value="">Select status</option>
-                  <option value="Single">Single</option>
-                  <option value="Married">Married</option>
-                  <option value="Divorced">Divorced</option>
-                  <option value="Widowed">Widowed</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Date of Birth *</label>
-                <input type="date" name="dateOfBirth" required>
-              </div>
-            </div>
+      const { data, error } = await supabaseClient.storage
+        .from(BUCKET)
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type || 'application/octet-stream'
+        });
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Country of Birth *</label>
-                <input type="text" name="countryOfBirth" value="Nigeria" required>
-              </div>
-              <div class="form-group">
-                <label>Nationality *</label>
-                <input type="text" name="nationality" value="Nigerian" required>
-              </div>
-              <div class="form-group">
-                <label>State of Origin *</label>
-                <select name="stateOfOrigin" required>
-                  <option value="">Select state</option>
-                  <option value="Abia">Abia</option><option value="Adamawa">Adamawa</option><option value="Akwa Ibom">Akwa Ibom</option><option value="Anambra">Anambra</option><option value="Bauchi">Bauchi</option><option value="Bayelsa">Bayelsa</option><option value="Benue">Benue</option><option value="Borno">Borno</option><option value="Cross River">Cross River</option><option value="Delta">Delta</option><option value="Ebonyi">Ebonyi</option><option value="Edo">Edo</option><option value="Ekiti">Ekiti</option><option value="Enugu">Enugu</option><option value="FCT">FCT</option><option value="Gombe">Gombe</option><option value="Imo">Imo</option><option value="Jigawa">Jigawa</option><option value="Kaduna">Kaduna</option><option value="Kano">Kano</option><option value="Katsina">Katsina</option><option value="Kebbi">Kebbi</option><option value="Kogi">Kogi</option><option value="Kwara">Kwara</option><option value="Lagos">Lagos</option><option value="Nasarawa">Nasarawa</option><option value="Niger">Niger</option><option value="Ogun">Ogun</option><option value="Ondo">Ondo</option><option value="Osun">Osun</option><option value="Oyo">Oyo</option><option value="Plateau">Plateau</option><option value="Rivers">Rivers</option><option value="Sokoto">Sokoto</option><option value="Taraba">Taraba</option><option value="Yobe">Yobe</option><option value="Zamfara">Zamfara</option>
-                </select>
-              </div>
-            </div>
+      if (error) {
+        throw new Error(`Upload failed: ${error.message}`);
+      }
 
-            <div class="form-grid two-col">
-              <div class="form-group">
-                <label>LGA (Local Government Area) *</label>
-                <input type="text" name="lga" placeholder="Your LGA" required>
-              </div>
-              <div class="form-group">
-                <label>Mother's Maiden Name *</label>
-                <input type="text" name="mothersMaidenName" placeholder="Your mother's maiden name" required>
-              </div>
-            </div>
-          </div>
+      return data.path;
+    }
 
-          <!-- Address Section -->
-          <div class="form-section">
-            <h4 class="form-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              Address Information
-            </h4>
-            <div class="form-group full-width">
-              <label>Residential Address *</label>
-              <textarea name="residentialAddress" placeholder="Enter your full residential address" rows="2" required></textarea>
-            </div>
+    async function openFileWithSignedUrl(path) {
+      if (!path) throw new Error('No uploaded file path found yet.');
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Nearest Bus Stop *</label>
-                <input type="text" name="nearestBusStop" placeholder="Nearest bus stop" required>
-              </div>
-              <div class="form-group">
-                <label>City/Town *</label>
-                <input type="text" name="cityTown" placeholder="Your city or town" required>
-              </div>
-              <div class="form-group">
-                <label>State of Residence *</label>
-                <select name="stateOfResidence" required>
-                  <option value="">Select state</option>
-                  <option value="Abia">Abia</option><option value="Adamawa">Adamawa</option><option value="Akwa Ibom">Akwa Ibom</option><option value="Anambra">Anambra</option><option value="Bauchi">Bauchi</option><option value="Bayelsa">Bayelsa</option><option value="Benue">Benue</option><option value="Borno">Borno</option><option value="Cross River">Cross River</option><option value="Delta">Delta</option><option value="Ebonyi">Ebonyi</option><option value="Edo">Edo</option><option value="Ekiti">Ekiti</option><option value="Enugu">Enugu</option><option value="FCT">FCT</option><option value="Gombe">Gombe</option><option value="Imo">Imo</option><option value="Jigawa">Jigawa</option><option value="Kaduna">Kaduna</option><option value="Kano">Kano</option><option value="Katsina">Katsina</option><option value="Kebbi">Kebbi</option><option value="Kogi">Kogi</option><option value="Kwara">Kwara</option><option value="Lagos">Lagos</option><option value="Nasarawa">Nasarawa</option><option value="Niger">Niger</option><option value="Ogun">Ogun</option><option value="Ondo">Ondo</option><option value="Osun">Osun</option><option value="Oyo">Oyo</option><option value="Plateau">Plateau</option><option value="Rivers">Rivers</option><option value="Sokoto">Sokoto</option><option value="Taraba">Taraba</option><option value="Yobe">Yobe</option><option value="Zamfara">Zamfara</option>
-                </select>
-              </div>
-            </div>
-          </div>
+      // Bucket is private, so public URLs are intentionally NOT used.
+      // Signed URLs are required to grant temporary, controlled access.
+      const { data, error } = await supabaseClient.storage
+        .from(BUCKET)
+        .createSignedUrl(path, 60);
 
-          <!-- Contact Section -->
-          <div class="form-section">
-            <h4 class="form-section-title">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Contact & Other Information
-            </h4>
-            <div class="form-grid two-col">
-              <div class="form-group">
-                <label>Occupation *</label>
-                <input type="text" name="occupation" placeholder="Your occupation" required>
-              </div>
-              <div class="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" name="phone" placeholder="e.g. +234 800 123 4567" required>
-              </div>
-            </div>
+      if (error || !data?.signedUrl) {
+        throw new Error(`Signed URL error: ${error?.message || 'No signed URL returned.'}`);
+      }
 
-            <div class="form-grid two-col">
-              <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" name="email" placeholder="your.email@example.com" required>
-              </div>
-              <div class="form-group">
-                <label>Statement Amount Needed *</label>
-                <input type="number" name="amountNeeded" placeholder="Amount to show in statement" required>
-              </div>
-            </div>
-          </div>
-        </div>
+      const opened = window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+      if (!opened) {
+        throw new Error('Popup blocked. Allow popups for this site and try again.');
+      }
+    }
 
-        <!-- Step 3: Next of Kin -->
-        <div class="form-step" data-step="3">
-          <h2 class="form-title">Next of Kin Information</h2>
-          <p class="form-subtitle">Provide details of a close relative or trusted person</p>
+    uploadBtn.addEventListener('click', async () => {
+      uploadBtn.disabled = true;
+      openBtn.disabled = true;
+      setStatus('Uploading...');
 
-          <div class="info-box">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            <div>
-              <strong>Why do we need this?</strong>
-              <p>Your next of kin serves as a backup contact for verification purposes and will only be contacted if we cannot reach you.</p>
-            </div>
-          </div>
+      try {
+        const file = fileInput.files?.[0];
+        uploadedPath = await uploadFile(file);
+        openBtn.disabled = false;
+        setStatus(`Upload successful.\nStored path: ${uploadedPath}`);
+      } catch (err) {
+        uploadedPath = null;
+        setStatus(err.message || 'Unknown upload error.', true);
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    });
 
-          <div class="form-section">
-            <div class="form-grid four-col">
-              <div class="form-group">
-                <label>Title *</label>
-                <select name="nokTitle" required>
-                  <option value="">Select</option>
-                  <option value="Mr">Mr</option>
-                  <option value="Mrs">Mrs</option>
-                  <option value="Miss">Miss</option>
-                  <option value="Ms">Ms</option>
-                  <option value="Dr">Dr</option>
-                  <option value="Prof">Prof</option>
-                  <option value="Chief">Chief</option>
-                  <option value="Alhaji">Alhaji</option>
-                  <option value="Alhaja">Alhaja</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Surname *</label>
-                <input type="text" name="nokSurname" placeholder="Surname" required>
-              </div>
-              <div class="form-group">
-                <label>First Name *</label>
-                <input type="text" name="nokFirstName" placeholder="First name" required>
-              </div>
-              <div class="form-group">
-                <label>Middle Name</label>
-                <input type="text" name="nokMiddleName" placeholder="Middle name">
-              </div>
-            </div>
+    openBtn.addEventListener('click', async () => {
+      openBtn.disabled = true;
+      setStatus('Creating signed URL...');
 
-            <div class="form-grid two-col">
-              <div class="form-group">
-                <label>Gender *</label>
-                <select name="nokGender" required>
-                  <option value="">Select gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Relationship to You *</label>
-                <select name="nokRelationship" required>
-                  <option value="">Select relationship</option>
-                  <option value="Father">Father</option>
-                  <option value="Mother">Mother</option>
-                  <option value="Brother">Brother</option>
-                  <option value="Sister">Sister</option>
-                  <option value="Spouse">Spouse</option>
-                  <option value="Son">Son</option>
-                  <option value="Daughter">Daughter</option>
-                  <option value="Uncle">Uncle</option>
-                  <option value="Aunt">Aunt</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-grid two-col">
-              <div class="form-group">
-                <label>Phone Number *</label>
-                <input type="tel" name="nokPhone" placeholder="e.g. +234 800 123 4567" required>
-              </div>
-              <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" name="nokEmail" placeholder="email@example.com" required>
-              </div>
-            </div>
-
-            <div class="form-group full-width">
-              <label>Full Address *</label>
-              <textarea name="nokAddress" placeholder="Complete address" rows="2" required></textarea>
-            </div>
-
-            <div class="form-grid two-col">
-              <div class="form-group">
-                <label>City/Town *</label>
-                <input type="text" name="nokCityTown" placeholder="City or town" required>
-              </div>
-              <div class="form-group">
-                <label>State *</label>
-                <select name="nokState" required>
-                  <option value="">Select state</option>
-                  <option value="Abia">Abia</option><option value="Adamawa">Adamawa</option><option value="Akwa Ibom">Akwa Ibom</option><option value="Anambra">Anambra</option><option value="Bauchi">Bauchi</option><option value="Bayelsa">Bayelsa</option><option value="Benue">Benue</option><option value="Borno">Borno</option><option value="Cross River">Cross River</option><option value="Delta">Delta</option><option value="Ebonyi">Ebonyi</option><option value="Edo">Edo</option><option value="Ekiti">Ekiti</option><option value="Enugu">Enugu</option><option value="FCT">FCT</option><option value="Gombe">Gombe</option><option value="Imo">Imo</option><option value="Jigawa">Jigawa</option><option value="Kaduna">Kaduna</option><option value="Kano">Kano</option><option value="Katsina">Katsina</option><option value="Kebbi">Kebbi</option><option value="Kogi">Kogi</option><option value="Kwara">Kwara</option><option value="Lagos">Lagos</option><option value="Nasarawa">Nasarawa</option><option value="Niger">Niger</option><option value="Ogun">Ogun</option><option value="Ondo">Ondo</option><option value="Osun">Osun</option><option value="Oyo">Oyo</option><option value="Plateau">Plateau</option><option value="Rivers">Rivers</option><option value="Sokoto">Sokoto</option><option value="Taraba">Taraba</option><option value="Yobe">Yobe</option><option value="Zamfara">Zamfara</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4: Documents -->
-        <div class="form-step" data-step="4">
-          <h2 class="form-title">Upload Your Documents</h2>
-          <p class="form-subtitle">Upload clear copies of all required documents</p>
-
-          <div class="info-box warning">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            <div>
-              <strong>Important Notes:</strong>
-              <ul>
-                <li>Maximum file size: 5MB per document</li>
-                <li>Accepted formats: JPG, PNG, PDF</li>
-                <li>Make sure all documents are clear and readable</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="upload-grid">
-            <div class="upload-zone" data-field="validId">
-              <input type="file" name="validId" accept="image/*,.pdf" hidden>
-              <div class="upload-content">
-                <div class="upload-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m15 8 2 2-2 2"/><path d="m15 14 2 2-2 2"/></svg>
-                </div>
-                <p class="upload-title">Valid ID Card</p>
-                <p class="upload-subtitle">NIN, Passport, or Driver's License</p>
-                <span class="upload-btn">Click to Upload</span>
-              </div>
-              <div class="upload-success" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                <span class="file-name"></span>
-              </div>
-            </div>
-
-            <div class="upload-zone" data-field="utilityBill">
-              <input type="file" name="utilityBill" accept="image/*,.pdf" hidden>
-              <div class="upload-content">
-                <div class="upload-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-                </div>
-                <p class="upload-title">Utility Bill</p>
-                <p class="upload-subtitle">Must not be older than 3 months</p>
-                <span class="upload-btn">Click to Upload</span>
-              </div>
-              <div class="upload-success" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                <span class="file-name"></span>
-              </div>
-            </div>
-
-            <div class="upload-zone" data-field="passportPhoto">
-              <input type="file" name="passportPhoto" accept="image/*" hidden>
-              <div class="upload-content">
-                <div class="upload-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
-                </div>
-                <p class="upload-title">Passport Photograph</p>
-                <p class="upload-subtitle">White background, recent photo</p>
-                <span class="upload-btn">Click to Upload</span>
-              </div>
-              <div class="upload-success" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                <span class="file-name"></span>
-              </div>
-            </div>
-
-            <div class="upload-zone" data-field="signature">
-              <input type="file" name="signature" accept="image/*" hidden>
-              <div class="upload-content">
-                <div class="upload-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                </div>
-                <p class="upload-title">Your Signature</p>
-                <p class="upload-subtitle">Clear signature on white paper</p>
-                <span class="upload-btn">Click to Upload</span>
-              </div>
-              <div class="upload-success" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                <span class="file-name"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 5: Payment -->
-        <div class="form-step" data-step="5">
-          <h2 class="form-title">Complete Your Payment</h2>
-          <p class="form-subtitle">Transfer the service fee and upload your payment proof</p>
-
-          <!-- Bank Account Card -->
-          <div class="bank-card">
-            <div class="bank-header">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-              <h3>Transfer to this Bank Account</h3>
-            </div>
-            <div class="bank-details">
-              <div class="bank-row">
-                <span class="bank-label">Bank Name</span>
-                <span class="bank-value">GTBank</span>
-              </div>
-              <div class="bank-row highlight">
-                <span class="bank-label">Account Number</span>
-                <span class="bank-value">0036214627</span>
-                <button type="button" class="copy-btn" onclick="copyToClipboard('0036214627', 'Account number')">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                  Copy
-                </button>
-              </div>
-              <div class="bank-row">
-                <span class="bank-label">Account Name</span>
-                <span class="bank-value">Aderemi Lawrence Alaba</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Payment Summary -->
-          <div class="payment-summary">
-            <h4>Payment Summary</h4>
-            <div class="summary-rows">
-              <div class="summary-row">
-                <span>Selected Plan</span>
-                <strong id="finalPlan">-</strong>
-              </div>
-              <div class="summary-row">
-                <span>Statement Amount</span>
-                <strong id="finalAmount">-</strong>
-              </div>
-              <div class="summary-row">
-                <span>Service Fee Rate</span>
-                <strong id="finalFeePercent">-</strong>
-              </div>
-            </div>
-            <div class="summary-total-row">
-              <span>Amount to Transfer</span>
-              <strong id="finalTotal">-</strong>
-            </div>
-          </div>
-
-          <!-- Payment Proof Upload -->
-          <div class="payment-proof-section">
-            <h4>Upload Payment Proof</h4>
-            <p>After making the transfer, upload a screenshot or photo of your payment receipt</p>
-            
-            <div class="upload-zone payment-proof" data-field="paymentProof">
-              <input type="file" name="paymentProof" accept="image/*,.pdf" hidden>
-              <div class="upload-content">
-                <div class="upload-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                </div>
-                <p class="upload-title">Payment Receipt</p>
-                <p class="upload-subtitle">Upload screenshot or photo of transfer</p>
-                <span class="upload-btn">Click to Upload</span>
-              </div>
-              <div class="upload-success" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                <span class="file-name"></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Applicant Info Summary -->
-          <div class="applicant-summary">
-            <h4>Your Information</h4>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">Full Name</span>
-                <span class="info-value" id="summaryName">-</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Email</span>
-                <span class="info-value" id="summaryEmail">-</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Phone</span>
-                <span class="info-value" id="summaryPhone">-</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Statement Amount</span>
-                <span class="info-value" id="summaryAmount">-</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="security-notice">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-            <div>
-              <strong>Secure & Confidential</strong>
-              <p>Your information is encrypted and will never be shared with third parties.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Navigation Buttons -->
-        <div class="form-navigation">
-          <button type="button" class="btn btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-            Previous
-          </button>
-          <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">
-            Continue
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-          </button>
-          <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-            Submit Application
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Pricing Section -->
-  <section class="pricing-section" id="pricing">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Our Pricing</span>
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
-        <p class="section-desc">Our service fee is a small percentage of your statement amount</p>
-      </div>
-      <div class="pricing-grid">
-        <div class="pricing-card" onclick="selectPlanAndShow('cas')">
-          <div class="pricing-icon icon-teal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-          </div>
-          <h3>CAS Only</h3>
-          <p class="pricing-desc">For university admission confirmation</p>
-          <div class="pricing-fee">
-            <span class="fee-big">1.2%</span>
-            <span class="fee-small">of statement amount</span>
-          </div>
-          <ul class="pricing-features">
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> CAS Documentation</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> University Support</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 3-5 Day Processing</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 24/7 Support</li>
-          </ul>
-          <button class="btn btn-outline btn-full">Get Started</button>
-        </div>
-
-        <div class="pricing-card popular">
-          <div class="popular-tag">MOST POPULAR</div>
-          <div class="pricing-icon icon-purple">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-          </div>
-          <h3>Visa Only</h3>
-          <p class="pricing-desc">For visa application proof of funds</p>
-          <div class="pricing-fee">
-            <span class="fee-big">1.2%</span>
-            <span class="fee-small">of statement amount</span>
-          </div>
-          <ul class="pricing-features">
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Visa Documentation</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Bank Statements</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Financial Verification</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Priority Processing</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 24/7 Support</li>
-          </ul>
-          <button class="btn btn-primary btn-full" onclick="selectPlanAndShow('visa')">Get Started</button>
-        </div>
-
-        <div class="pricing-card" onclick="selectPlanAndShow('both')">
-          <div class="pricing-icon icon-orange">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <h3>CAS + Visa</h3>
-          <p class="pricing-desc">Complete package for both services</p>
-          <div class="pricing-fee">
-            <span class="fee-big">1.7%</span>
-            <span class="fee-small">of statement amount</span>
-          </div>
-          <ul class="pricing-features">
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Both CAS & Visa</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Fast-track Processing</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Dedicated Manager</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Success Guarantee</li>
-            <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> Priority Support</li>
-          </ul>
-          <button class="btn btn-outline btn-full">Get Started</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works -->
-  <section class="how-it-works" id="how-it-works">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Process</span>
-        <h2 class="section-title">How It Works</h2>
-        <p class="section-desc">Simple 4-step process to get your proof of funds</p>
-      </div>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-number">1</div>
-          <div class="step-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
-          </div>
-          <h3>Choose Plan</h3>
-          <p>Select the service that fits your needs and enter your statement amount</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">2</div>
-          <div class="step-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <h3>Submit Details</h3>
-          <p>Fill in your personal information and next of kin details</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">3</div>
-          <div class="step-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-          </div>
-          <h3>Upload Documents</h3>
-          <p>Upload your ID, utility bill, passport photo, and signature</p>
-        </div>
-        <div class="step-card">
-          <div class="step-number">4</div>
-          <div class="step-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-          </div>
-          <h3>Pay & Get Approved</h3>
-          <p>Transfer the fee, upload payment proof, and receive your documents</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
-  <section class="features-section" id="features">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Why Us</span>
-        <h2 class="section-title">Why Choose FundProof Pro</h2>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon icon-teal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-          </div>
-          <h3>Bank-Grade Security</h3>
-          <p>Your documents are protected with military-grade encryption</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon icon-purple">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <h3>Fast Processing</h3>
-          <p>Get your documents within 3-5 business days</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon icon-orange">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <h3>100% Compliance</h3>
-          <p>Documents meet embassy and university requirements</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon icon-green">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          </div>
-          <h3>24/7 Support</h3>
-          <p>Round-the-clock assistance via phone and WhatsApp</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon icon-blue">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          </div>
-          <h3>Global Acceptance</h3>
-          <p>Documents accepted by embassies and universities worldwide</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon icon-red">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-          </div>
-          <h3>Affordable Pricing</h3>
-          <p>Competitive percentage-based fees for all budgets</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section class="contact-section" id="contact">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Contact</span>
-        <h2 class="section-title">Need Help? Contact Us</h2>
-        <p class="section-desc">Our team is available 24/7 to assist you</p>
-      </div>
-      
-      <div class="contact-cards">
-        <a href="tel:+8801750417012" class="contact-card">
-          <div class="contact-icon phone">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          </div>
-          <div class="contact-info">
-            <span class="contact-label">Call Us</span>
-            <span class="contact-value">+880 1750-417012</span>
-          </div>
-          <div class="contact-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
-        </a>
-        
-        <a href="https://wa.me/8801750417012" target="_blank" class="contact-card whatsapp">
-          <div class="contact-icon whatsapp-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          </div>
-          <div class="contact-info">
-            <span class="contact-label">WhatsApp</span>
-            <span class="contact-value">+880 1750-417012</span>
-          </div>
-          <div class="contact-arrow">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <a href="#" class="logo">
-          <div class="logo-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-          </div>
-          <span class="logo-text">FundProof Pro</span>
-        </a>
-        <div class="footer-links">
-          <a href="#home">Home</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="#features">Features</a>
-          <a href="#contact">Contact</a>
-        </div>
-        <p class="copyright">&copy; 2025 FundProof Pro. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Toast Notification -->
-  <div class="toast" id="toast">
-    <span class="toast-message"></span>
-  </div>
-
-  <script src="script.js"></script>
+      try {
+        await openFileWithSignedUrl(uploadedPath);
+        setStatus('Signed URL created. File opened in a new tab (valid for 60 seconds).');
+      } catch (err) {
+        setStatus(err.message || 'Could not open file with signed URL.', true);
+      } finally {
+        openBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

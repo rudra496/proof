@@ -1,0 +1,14 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Runtime storage (keep folder structure only)
+data/uploads/*
+!data/uploads/.gitkeep
+data/applications/*
+!data/applications/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
