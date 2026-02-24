@@ -347,6 +347,8 @@ async function handleFileUpload(field, file, zone) {
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const storagePath = `${field}/${timestamp}-${uuid}-${sanitizedName}`;
 
+  // Clear any previous file metadata immediately to avoid stale submits while upload is in flight
+  uploadedFiles[field] = null;
   zone.style.pointerEvents = 'none';
 
   try {
@@ -372,7 +374,7 @@ async function handleFileUpload(field, file, zone) {
     showToast('File uploaded successfully', 'success');
   } catch (error) {
     if (input) input.value = '';
-    delete uploadedFiles[field];
+    uploadedFiles[field] = null;
     content.style.display = 'block';
     success.style.display = 'none';
     zone.classList.remove('uploaded');
