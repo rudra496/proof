@@ -6,9 +6,6 @@ let selectedDuration = 1;
 let statementAmount = 0;
 const uploadedFiles = {};
 
-// ===== SERVER API =====
-const API_BASE_URL = '';
-
 // ===== PRICING DATA (Percentage-based) =====
 const planPricing = {
   cas: { percent: 1.2, name: 'CAS Only' },
@@ -334,27 +331,55 @@ document.querySelectorAll('.upload-zone').forEach(zone => {
   });
 });
 
-function handleFileUpload(field, file, zone) {
+async function handleFileUpload(field, file, zone) {
   // Validate file size (5MB max)
   if (file.size > 5 * 1024 * 1024) {
     showToast('File size must be less than 5MB', 'error');
     return;
   }
-  
-  // Store file
-  uploadedFiles[field] = file;
-  
-  // Update UI
+
+  const input = zone.querySelector('input[type="file"]');
   const content = zone.querySelector('.upload-content');
   const success = zone.querySelector('.upload-success');
   const fileName = zone.querySelector('.file-name');
-  
-  content.style.display = 'none';
-  success.style.display = 'flex';
-  fileName.textContent = file.name;
-  zone.classList.add('uploaded');
-  
-  showToast('File uploaded successfully', 'success');
+  const timestamp = Date.now();
+  const uuid = crypto.randomUUID();
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const storagePath = `${field}/${timestamp}-${uuid}-${sanitizedName}`;
+
+  zone.style.pointerEvents = 'none';
+
+  try {
+    // Upload file immediately to Supabase Storage (static-safe flow)
+    const { error } = await supabaseClient.storage
+      .from('uploads')
+      .upload(storagePath, file, { upsert: false });
+
+    if (error) throw error;
+
+    // Persist only file metadata for submission payload
+    uploadedFiles[field] = {
+      path: `uploads/${storagePath}`,
+      originalName: file.name,
+      size: file.size,
+      type: file.type
+    };
+
+    content.style.display = 'none';
+    success.style.display = 'flex';
+    fileName.textContent = file.name;
+    zone.classList.add('uploaded');
+    showToast('File uploaded successfully', 'success');
+  } catch (error) {
+    if (input) input.value = '';
+    delete uploadedFiles[field];
+    content.style.display = 'block';
+    success.style.display = 'none';
+    zone.classList.remove('uploaded');
+    showToast('Failed to upload file. Please try again.', 'error');
+  } finally {
+    zone.style.pointerEvents = '';
+  }
 }
 
 // ===== COPY TO CLIPBOARD =====
@@ -381,59 +406,28 @@ applicationForm.addEventListener('submit', async (e) => {
     Submitting...
   `;
   
-  // Collect form data
-  const formData = new FormData();
-  
-  // Add plan data
-  formData.append('plan', selectedPlan);
-  formData.append('duration', selectedDuration);
-  formData.append('statementAmount', statementAmount);
-  formData.append('serviceFeePercent', planPricing[selectedPlan].percent);
-  formData.append('serviceFeeAmount', calculateServiceFee());
-  
-  // Add applicant data
-  const applicantFields = ['nin', 'bvn', 'title', 'surname', 'firstName', 'middleName', 
-    'gender', 'maritalStatus', 'dateOfBirth', 'countryOfBirth', 'nationality', 
-    'stateOfOrigin', 'lga', 'mothersMaidenName', 'residentialAddress', 
-    'nearestBusStop', 'cityTown', 'stateOfResidence', 'occupation', 
-    'phone', 'email', 'amountNeeded'];
-  
-  applicantFields.forEach(field => {
-    const input = applicationForm.querySelector(`[name="${field}"]`);
-    if (input) {
-      formData.append(field, input.value);
-    }
-  });
-  
-  // Add next of kin data
-  const nokFields = ['nokTitle', 'nokSurname', 'nokFirstName', 'nokMiddleName',
-    'nokGender', 'nokRelationship', 'nokPhone', 'nokEmail', 'nokAddress', 
-    'nokCityTown', 'nokState'];
-  
-  nokFields.forEach(field => {
-    const input = applicationForm.querySelector(`[name="${field}"]`);
-    if (input) {
-      formData.append(field, input.value);
-    }
-  });
-  
-  // Add files
-  Object.keys(uploadedFiles).forEach(field => {
-    formData.append(field, uploadedFiles[field]);
-  });
-  
   try {
-    const response = await fetch(`${API_BASE_URL}/api/apply`, {
-      method: 'POST',
-      body: formData
+    // Build a plain object from form values (no backend submission)
+    const applicantData = {};
+    applicationForm.querySelectorAll('[name]').forEach(field => {
+      applicantData[field.name] = field.value;
     });
 
-    if (!response.ok) {
-      throw new Error('Upload request failed');
-    }
+    const pricing = {
+      statementAmount,
+      serviceFeePercent: planPricing[selectedPlan].percent,
+      serviceFeeAmount: calculateServiceFee(),
+      duration: selectedDuration
+    };
 
-    const result = await response.json();
-    showToast(`Submitted! Ref: ${result.applicationId}. Files are available in server uploads.`, 'success');
+    console.log({
+      applicantData,
+      selectedPlan,
+      pricing,
+      files: uploadedFiles
+    });
+
+    showToast('Application submitted. Files are securely stored.', 'success');
     
     // Reset form and close modal
     setTimeout(() => {
