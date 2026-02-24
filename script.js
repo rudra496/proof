@@ -552,3 +552,4 @@ window.selectDuration = selectDuration;
 window.toggleMobileMenu = toggleMobileMenu;
 window.calculateFee = calculateFee;
 window.copyToClipboard = copyToClipboard;
+
